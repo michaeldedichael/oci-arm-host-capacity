@@ -17,18 +17,33 @@ jobs:
       - name: Write private key file
         run: echo "${{ secrets.OCI_KEY_FILE_CONTENT }}" > /tmp/oci_key.pem
       - name: Create .env file
+        env:
+          OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
+          OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
+          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_REGION: ${{ secrets.OCI_REGION }}
+          OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
+          OCI_IMAGE_ID: ${{ secrets.OCI_IMAGE_ID }}
+          OCI_SSH_PUBLIC_KEY: ${{ secrets.OCI_SSH_PUBLIC_KEY }}
+          OCI_OCPUS: ${{ secrets.OCI_OCPUS }}
+          OCI_MEMORY_IN_GBS: ${{ secrets.OCI_MEMORY_IN_GBS }}
         run: |
-          printf '%s\n' \
-            "OCI_USER_ID=${{ secrets.OCI_USER_ID }}" \
-            "OCI_TENANCY_ID=${{ secrets.OCI_TENANCY_ID }}" \
-            "OCI_FINGERPRINT=${{ secrets.OCI_FINGERPRINT }}" \
-            "OCI_REGION=${{ secrets.OCI_REGION }}" \
-            "OCI_PRIVATE_KEY_FILENAME=/tmp/oci_key.pem" \
-            "OCI_SUBNET_ID=${{ secrets.OCI_SUBNET_ID }}" \
-            "OCI_IMAGE_ID=${{ secrets.OCI_IMAGE_ID }}" \
-            "OCI_SSH_PUBLIC_KEY=${{ secrets.OCI_SSH_PUBLIC_KEY }}" \
-            "OCI_OCPUS=${{ secrets.OCI_OCPUS }}" \
-            "OCI_MEMORY_IN_GBS=${{ secrets.OCI_MEMORY_IN_GBS }}" \
-            "OCI_SHAPE=VM.Standard.A1.Flex" > .env
+          python3 -c "
+          import os
+          lines = [
+            'OCI_USER_ID=\"' + os.environ['OCI_USER_ID'] + '\"',
+            'OCI_TENANCY_ID=\"' + os.environ['OCI_TENANCY_ID'] + '\"',
+            'OCI_FINGERPRINT=\"' + os.environ['OCI_FINGERPRINT'] + '\"',
+            'OCI_REGION=\"' + os.environ['OCI_REGION'] + '\"',
+            'OCI_PRIVATE_KEY_FILENAME=\"/tmp/oci_key.pem\"',
+            'OCI_SUBNET_ID=\"' + os.environ['OCI_SUBNET_ID'] + '\"',
+            'OCI_IMAGE_ID=\"' + os.environ['OCI_IMAGE_ID'] + '\"',
+            'OCI_SSH_PUBLIC_KEY=\"' + os.environ['OCI_SSH_PUBLIC_KEY'] + '\"',
+            'OCI_OCPUS=' + os.environ['OCI_OCPUS'],
+            'OCI_MEMORY_IN_GBS=' + os.environ['OCI_MEMORY_IN_GBS'],
+            'OCI_SHAPE=VM.Standard.A1.Flex',
+          ]
+          open('.env', 'w').write('\n'.join(lines))
+          "
       - name: Run instance creation script
         run: php index.php
