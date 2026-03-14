@@ -20,7 +20,7 @@ jobs:
         env:
           OCI_USER_ID: ${{ secrets.OCI_USER_ID }}
           OCI_TENANCY_ID: ${{ secrets.OCI_TENANCY_ID }}
-          OCI_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
+          OCI_KEY_FINGERPRINT: ${{ secrets.OCI_FINGERPRINT }}
           OCI_REGION: ${{ secrets.OCI_REGION }}
           OCI_PRIVATE_KEY_FILENAME: /tmp/oci_key.pem
           OCI_SUBNET_ID: ${{ secrets.OCI_SUBNET_ID }}
